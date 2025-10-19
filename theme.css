@@ -1,0 +1,153 @@
+/**
+ * Theme: Midnight Mauve v9 - Prismatic Kinetic
+ * Description: The final, stable fusion. This version combines the flawless v4.1
+ * transparent background and smooth "Kinetic Fade" entrance with the advanced
+ * "Prismatic Glow" text effect.
+ * Version: 9.0
+ */
+
+:root {
+  /* --- Universal Settings --- */
+  --blyrics-font: "JetBrains Mono", "Fira Code", monospace;
+
+  /*
+  ===========================================================
+    HOW TO SWITCH VIBES (Affects Border & Glow Base):
+  ===========================================================
+  */
+
+  /* == VIBE 1: MIDNIGHT MAVE (Default Purple/Blue) == */
+  --active-lyric-glow: rgba(203, 166, 247, 0.5);
+  --border-color-alpha: rgba(203, 166, 247, 0.2);
+
+
+  /* == VIBE 2: SUNSET GLOW (Warm Orange/Peach) == */
+  /*
+  --active-lyric-glow: rgba(250, 179, 135, 0.5);
+  --border-color-alpha: rgba(250, 179, 135, 0.2);
+  */
+
+  /* --- Shared Colors (Applied to all vibes) --- */
+  --bg-color-alpha: rgba(30, 30, 46, 0.75);
+  --upcoming-lyric-color: #cdd6f4;
+  --past-lyric-color: rgba(108, 112, 134, 0.45);
+}
+
+
+/*
+ * ===================================================================
+ * Animations
+ * ===================================================================
+ */
+
+/* Controls the slow, shifting movement of the container's background gradient */
+@keyframes aurora-flow {
+  0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; }
+}
+
+/* NEW: Controls the shifting gradient of the prismatic text */
+@keyframes prismatic-flow {
+  0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; }
+}
+
+/* UPDATED: The entrance animation now fades in the drop-shadow filter */
+@keyframes kinetic-focus {
+  from {
+    opacity: 0.8;
+    transform: translateY(8px);
+    filter: drop-shadow(0 0 5px transparent);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+    filter: drop-shadow(0 0 12px var(--active-lyric-glow));
+  }
+}
+
+
+/*
+ * ===================================================================
+ * Main Styles
+ * ===================================================================
+ */
+
+/* The main container for the entire lyrics panel. UNCHANGED AND STABLE. */
+.blyrics-container {
+  font-family: var(--blyrics-font);
+  font-size: 2.5rem;
+  font-weight: 700;
+  line-height: 1.6;
+  padding: 20px;
+  border-radius: 12px;
+  border: 1px solid var(--border-color-alpha);
+  overflow: hidden;
+  position: relative;
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  background: var(--aurora-gradient) no-repeat, var(--bg-color-alpha);
+  background-size: 400% 400%;
+  animation: aurora-flow 18s ease-in-out infinite;
+  color-scheme: dark;
+}
+
+/* Default state for individual lyric lines. UNCHANGED. */
+.blyrics-container > div {
+  color: var(--upcoming-lyric-color);
+  opacity: 0.9;
+  filter: blur(0px);
+  transition: filter 0.5s ease, opacity 0.5s ease, transform 0.2s ease;
+}
+
+/* Style for lyrics that have already been sung. UNCHANGED. */
+.blyrics-container:not(.blyrics-user-scrolling) > .blyrics--line:has(~ .blyrics--active) {
+  color: var(--past-lyric-color);
+  opacity: 0.5;
+  filter: blur(2.5px);
+  transition: filter 0.5s 0.35s, opacity 0.5s 0.35s, transform 0.2s;
+}
+
+/* UPDATED: The active lyric container now applies the entrance animation */
+.blyrics-container > div.blyrics--active {
+  /* Applies the smooth float-up, fade-in, and glow-bloom animation */
+  animation: kinetic-focus 0.8s cubic-bezier(0.25, 1, 0.5, 1);
+  /* We must set the final state here as well for when the animation ends */
+  opacity: 1;
+  transform: translateY(0);
+  filter: drop-shadow(0 0 12px var(--active-lyric-glow));
+}
+
+/* NEW: The <span> inside the active div gets the prismatic text effect */
+.blyrics-container > div.blyrics--active > span {
+  /* A foundational purple glow that sits directly behind the text */
+  text-shadow: 0 0 12px rgba(203, 166, 247, 0.5);
+
+  /* The animated, multi-colored gradient text effect */
+  background: linear-gradient(125deg, #cba6f7, #f5c2e7, #89b4fa, #94e2d5, #cba6f7);
+  background-size: 400%;
+  animation: prismatic-flow 8s ease-in-out infinite;
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+}
+
+/* Special styling for translated/romanized text. UNCHANGED. */
+.blyrics-container > div > span.blyrics--translated,
+.blyrics-container > div > span.blyrics--romanized {
+  display: block; margin-top: 10px; font-size: 1.8rem; font-weight: 500; opacity: 0.9;
+}
+.blyrics-container > div > span.blyrics--romanized {
+  font-size: 1.5rem; font-style: italic;
+}
+
+
+/*
+ * ===================================================================
+ * Responsive Design
+ * ===================================================================
+ */
+
+@media (max-width: 615px) {
+  .blyrics-container { font-size: 2rem; }
+  .blyrics-container > div > span.blyrics--translated { font-size: 1.5rem; }
+  .blyrics-container > div > span.blyrics--romanized { font-size: 1.3rem; }
+}
