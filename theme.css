@@ -1,151 +1,186 @@
 /**
- * Theme: Midnight Mauve v9 - Prismatic Kinetic
- * Description: The final, stable fusion. This version combines the flawless v4.1
- * transparent background and smooth "Kinetic Fade" entrance with the advanced
- * "Prismatic Glow" text effect.
- * Version: 9.0
- * Star It if you like it
+ * Theme: Midnight Mauve (v13) - Prismatic Kinetic
+ * Description: The ultimate combination. Features a borderless "Liquid Glass" container
+ * that lets the album art shine through, paired with a sharp, high-performance
+ * "Prismatic Wave" animation on the active lyrics.
+ * Star if you like it ;3
  */
+ 
+/* === CONFIGURATION KNOBS === */
+/*
+blyrics-line-synced-animation-delay = 50;
+blyrics-long-word-threshold = 1500;
+*/
 
 :root {
-  /* --- Universal Settings --- */
-  --blyrics-font: "JetBrains Mono", "Fira Code", monospace;
+  /* --- TYPOGRAPHY --- */
+  --blyrics-font-family: "JetBrains Mono", "Fira Code", monospace;
+  --blyrics-font-weight: 700;
 
-  /*
-  ===========================================================
-    HOW TO SWITCH VIBES (Affects Border & Glow Base):
-  ===========================================================
-  */
-
-  /* == VIBE 1: MIDNIGHT MAVE (Default Purple/Blue) == */
-  --active-lyric-glow: rgba(203, 166, 247, 0.5);
-  --border-color-alpha: rgba(203, 166, 247, 0.2);
-
-
-  /* == VIBE 2: SUNSET GLOW (Warm Orange/Peach) == */
-  /*
-  --active-lyric-glow: rgba(250, 179, 135, 0.5);
-  --border-color-alpha: rgba(250, 179, 135, 0.2);
-  */
-
-  /* --- Shared Colors (Applied to all vibes) --- */
-  --bg-color-alpha: rgba(30, 30, 46, 0.75);
-  --upcoming-lyric-color: #cdd6f4;
-  --past-lyric-color: rgba(108, 112, 134, 0.45);
+  /* --- COLORS --- */
+  /* The "Mauve" Palette for the Prismatic Wave */
+  --primary-glow: #cba6f7;  /* Mauve */
+  --secondary-glow: #f5c2e7; /* Pink */
+  --tertiary-glow: #89b4fa;  /* Blue */
+  
+  /* Background: Ultra-transparent dark tint for readability */
+  --glass-bg: rgba(15, 15, 25, 0.2); 
 }
 
-
-/*
- * ===================================================================
- * Animations
- * ===================================================================
+/* * ===================================================================
+ * MAIN CONTAINER (The Liquid Glass)
+ * =================================================================== 
  */
-
-/* Controls the slow, shifting movement of the container's background gradient */
-@keyframes aurora-flow {
-  0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; }
-}
-
-/* NEW: Controls the shifting gradient of the prismatic text */
-@keyframes prismatic-flow {
-  0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; }
-}
-
-/* UPDATED: The entrance animation now fades in the drop-shadow filter */
-@keyframes kinetic-focus {
-  from {
-    opacity: 0.8;
-    transform: translateY(8px);
-    filter: drop-shadow(0 0 5px transparent);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-    filter: drop-shadow(0 0 12px var(--active-lyric-glow));
-  }
-}
-
-
-/*
- * ===================================================================
- * Main Styles
- * ===================================================================
- */
-
-/* The main container for the entire lyrics panel. UNCHANGED AND STABLE. */
 .blyrics-container {
-  font-family: var(--blyrics-font);
+  font-family: var(--blyrics-font-family);
   font-size: 2.5rem;
   font-weight: 700;
-  line-height: 1.6;
+  line-height: 1.5;
   padding: 20px;
   border-radius: 12px;
-  border: 1px solid var(--border-color-alpha);
   overflow: hidden;
   position: relative;
-  backdrop-filter: blur(18px);
-  -webkit-backdrop-filter: blur(18px);
-  background: var(--aurora-gradient) no-repeat, var(--bg-color-alpha);
-  background-size: 400% 400%;
-  animation: aurora-flow 18s ease-in-out infinite;
+  z-index: 1;
+  
+  /* NO BORDERS - Seamless flow */
+  border: none;
+
+  /* The Crystal Effect: High Blur + High Transparency 
+     This allows the dynamic colors of the song's album art to pass through
+     naturally, syncing the vibe without forced colors.
+  */
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  
+  background: var(--glass-bg);
   color-scheme: dark;
 }
 
-/* Default state for individual lyric lines. UNCHANGED. */
-.blyrics-container > div {
-  color: var(--upcoming-lyric-color);
-  opacity: 0.9;
-  filter: blur(0px);
-  transition: filter 0.5s ease, opacity 0.5s ease, transform 0.2s ease;
+/* * ===================================================================
+ * PAST LYRICS (Focus Management)
+ * =================================================================== 
+ */
+.blyrics-container:has(.blyrics--active) > div:not(.blyrics--active):not(.blyrics--active ~ div) {
+  opacity: 0.25; 
+  /* Slight blur to push past lyrics into the background, 
+     but kept minimal to preserve sharpness of the UI */
+  filter: blur(2px);
+  transform: scale(0.98);
+  transition: opacity 0.8s ease, filter 0.8s ease, transform 0.8s ease;
 }
 
-/* Style for lyrics that have already been sung. UNCHANGED. */
-.blyrics-container:not(.blyrics-user-scrolling) > .blyrics--line:has(~ .blyrics--active) {
-  color: var(--past-lyric-color);
+/* * ===================================================================
+ * FUTURE LYRICS 
+ * =================================================================== 
+ */
+.blyrics-container > div.blyrics--active ~ div {
   opacity: 0.5;
-  filter: blur(2.5px);
-  transition: filter 0.5s 0.35s, opacity 0.5s 0.35s, transform 0.2s;
+  filter: blur(0px);
+  transform: scale(1);
+  transition: opacity 0.5s ease;
 }
 
-/* UPDATED: The active lyric container now applies the entrance animation */
+/* * ===================================================================
+ * ACTIVE LINE & WORDS (The Prismatic Wave)
+ * =================================================================== 
+ */
+
+/* The Container for the active line */
 .blyrics-container > div.blyrics--active {
-  /* Applies the smooth float-up, fade-in, and glow-bloom animation */
-  animation: kinetic-focus 0.8s cubic-bezier(0.25, 1, 0.5, 1);
-  /* We must set the final state here as well for when the animation ends */
   opacity: 1;
-  transform: translateY(0);
-  filter: drop-shadow(0 0 12px var(--active-lyric-glow));
+  filter: blur(0px);
+  transform: scale(1.02);
+  /* Smooth transition when a line becomes active */
+  transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 
-/* NEW: The <span> inside the active div gets the prismatic text effect */
+/* The Words inside the active line */
 .blyrics-container > div.blyrics--active > span {
-  /* A foundational purple glow that sits directly behind the text */
-  text-shadow: 0 0 12px rgba(203, 166, 247, 0.5);
-
-  /* The animated, multi-colored gradient text effect */
-  background: linear-gradient(125deg, #cba6f7, #f5c2e7, #89b4fa, #94e2d5, #cba6f7);
-  background-size: 400%;
-  animation: prismatic-flow 8s ease-in-out infinite;
-  background-clip: text;
-  -webkit-background-clip: text;
-  color: transparent;
+  display: inline-block;
+  
+  /* Hardware acceleration hints for smoother animation without blur */
+  will-change: transform, color, text-shadow;
+  
+  /* The Prismatic Wave Animation */
+  animation: prismatic-wave 4s ease-in-out infinite alternate;
 }
 
-/* Special styling for translated/romanized text. UNCHANGED. */
+/* The Animation: Cycles through Mauve, Pink, and Blue.
+   We use a 'transform' based wave instead of a jump for better flow.
+   The color change affects the 'base' text (the unhighlighted part),
+   while the extension fills the sung part with white automatically.
+*/
+@keyframes prismatic-wave {
+  0% {
+    color: var(--primary-glow);
+    text-shadow: 0 0 12px rgba(203, 166, 247, 0.4);
+    transform: translateY(0);
+  }
+  33% {
+    color: var(--secondary-glow);
+    text-shadow: 0 0 16px rgba(245, 194, 231, 0.6);
+    transform: translateY(-3px); 
+  }
+  66% {
+    color: var(--tertiary-glow);
+    text-shadow: 0 0 12px rgba(137, 180, 250, 0.4);
+    transform: translateY(-1px);
+  }
+  100% {
+    color: var(--primary-glow);
+    text-shadow: 0 0 12px rgba(203, 166, 247, 0.4);
+    transform: translateY(0);
+  }
+}
+
+/* * ===================================================================
+ * INSTRUMENTALS
+ * =================================================================== 
+ */
+.blyrics--instrumental-icon {
+  width: 3.5rem;
+  height: 3.5rem;
+  margin-top: 10px;
+  animation: note-float 4s ease-in-out infinite;
+}
+
+.blyrics--instrumental-fill {
+  fill: var(--primary-glow) !important;
+}
+
+.blyrics--instrumental-bg {
+  fill: rgba(255, 255, 255, 0.1) !important;
+}
+
+@keyframes note-float {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  50% { transform: translateY(-8px) rotate(5deg); }
+}
+
+/* * ===================================================================
+ * EXTRAS (Translation & Mobile)
+ * =================================================================== 
+ */
 .blyrics-container > div > span.blyrics--translated,
 .blyrics-container > div > span.blyrics--romanized {
-  display: block; margin-top: 10px; font-size: 1.8rem; font-weight: 500; opacity: 0.9;
+  display: block;
+  margin-top: 8px;
+  font-size: 1.8rem;
+  opacity: 0.7;
+  color: #a6adc8; 
+  animation: none !important;
+  text-shadow: none !important;
+  transform: none !important;
 }
+
 .blyrics-container > div > span.blyrics--romanized {
-  font-size: 1.5rem; font-style: italic;
+  font-size: 1.5rem;
+  font-style: italic;
+  background: rgba(255,255,255,0.05);
+  padding: 0.2rem 0.6rem;
+  border-radius: 8px;
+  width: fit-content;
 }
-
-
-/*
- * ===================================================================
- * Responsive Design
- * ===================================================================
- */
 
 @media (max-width: 615px) {
   .blyrics-container { font-size: 2rem; }
