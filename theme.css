@@ -1,14 +1,11 @@
 /**
- * Theme: Midnight Mauve (v13) - Prismatic Kinetic
- * Description: The ultimate combination. Features a borderless "Liquid Glass" container
- * that lets the album art shine through, paired with a sharp, high-performance
- * "Prismatic Wave" animation on the active lyrics.
- * Star if you like it ;3
+ * Theme: Midnight Mauve (Fluid v14) - Prismatic Kinetic
+ * Description: Transparent background version.
  */
- 
+
 /* === CONFIGURATION KNOBS === */
 /*
-blyrics-line-synced-animation-delay = 50;
+blyrics-line-synced-animation-delay = 20;
 blyrics-long-word-threshold = 1500;
 */
 
@@ -17,14 +14,17 @@ blyrics-long-word-threshold = 1500;
   --blyrics-font-family: "JetBrains Mono", "Fira Code", monospace;
   --blyrics-font-weight: 700;
 
+  /* --- FLUID MOTION VARIABLES --- */
+  --blyrics-lyric-scroll-duration: 800ms;
+  --blyrics-lyric-scroll-timing-function: cubic-bezier(0.25, 1, 0.5, 1);
+
   /* --- COLORS --- */
-  /* The "Mauve" Palette for the Prismatic Wave */
-  --primary-glow: #cba6f7;  /* Mauve */
+  --primary-glow: #cba6f7;   /* Mauve */
   --secondary-glow: #f5c2e7; /* Pink */
   --tertiary-glow: #89b4fa;  /* Blue */
-  
-  /* Background: Ultra-transparent dark tint for readability */
-  --glass-bg: rgba(15, 15, 25, 0.2); 
+   
+  /* Background: Completely Transparent */
+  --glass-bg: transparent; 
 }
 
 /* * ===================================================================
@@ -35,49 +35,51 @@ blyrics-long-word-threshold = 1500;
   font-family: var(--blyrics-font-family);
   font-size: 2.5rem;
   font-weight: 700;
-  line-height: 1.5;
+  line-height: 1.6; 
   padding: 20px;
   border-radius: 12px;
   overflow: hidden;
   position: relative;
   z-index: 1;
-  
-  /* NO BORDERS - Seamless flow */
+   
   border: none;
 
-  /* The Crystal Effect: High Blur + High Transparency 
-     This allows the dynamic colors of the song's album art to pass through
-     naturally, syncing the vibe without forced colors.
-  */
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
+  /* REMOVED BLUR as requested */
+  /* backdrop-filter: blur(20px); */
+  /* -webkit-backdrop-filter: blur(20px); */
   
+  /* GPU FORCE: Prevents flicker during heavy scrolling */
+  transform: translateZ(0);
+  backface-visibility: hidden;
+   
   background: var(--glass-bg);
   color-scheme: dark;
 }
 
 /* * ===================================================================
- * PAST LYRICS (Focus Management)
+ * PAST LYRICS (Background)
  * =================================================================== 
  */
 .blyrics-container:has(.blyrics--active) > div:not(.blyrics--active):not(.blyrics--active ~ div) {
-  opacity: 0.25; 
-  /* Slight blur to push past lyrics into the background, 
-     but kept minimal to preserve sharpness of the UI */
-  filter: blur(2px);
-  transform: scale(0.98);
-  transition: opacity 0.8s ease, filter 0.8s ease, transform 0.8s ease;
+  opacity: 0.2; 
+  filter: blur(3px);
+  transform: scale(0.96) translateZ(0); 
+  
+  transition: 
+    opacity 0.6s ease-out, 
+    filter 0.8s cubic-bezier(0.2, 0.8, 0.2, 1), 
+    transform 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 
 /* * ===================================================================
- * FUTURE LYRICS 
+ * FUTURE LYRICS (Foreground)
  * =================================================================== 
  */
 .blyrics-container > div.blyrics--active ~ div {
   opacity: 0.5;
   filter: blur(0px);
-  transform: scale(1);
-  transition: opacity 0.5s ease;
+  transform: scale(1) translateZ(0);
+  transition: opacity 0.4s ease-out, transform 0.4s ease-out;
 }
 
 /* * ===================================================================
@@ -89,46 +91,40 @@ blyrics-long-word-threshold = 1500;
 .blyrics-container > div.blyrics--active {
   opacity: 1;
   filter: blur(0px);
-  transform: scale(1.02);
-  /* Smooth transition when a line becomes active */
-  transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+  transform: scale(1.05) translateZ(0); 
+  
+  transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
 /* The Words inside the active line */
 .blyrics-container > div.blyrics--active > span {
   display: inline-block;
+  white-space: pre; 
   
-  /* Hardware acceleration hints for smoother animation without blur */
   will-change: transform, color, text-shadow;
   
-  /* The Prismatic Wave Animation */
-  animation: prismatic-wave 4s ease-in-out infinite alternate;
+  /* Stopped vibration with !important */
+  animation: prismatic-wave 3s cubic-bezier(0.45, 0, 0.55, 1) infinite !important;
 }
 
-/* The Animation: Cycles through Mauve, Pink, and Blue.
-   We use a 'transform' based wave instead of a jump for better flow.
-   The color change affects the 'base' text (the unhighlighted part),
-   while the extension fills the sung part with white automatically.
-*/
+/* REFINED WAVE ANIMATION */
 @keyframes prismatic-wave {
   0% {
     color: var(--primary-glow);
-    text-shadow: 0 0 12px rgba(203, 166, 247, 0.4);
+    text-shadow: 0 0 15px rgba(203, 166, 247, 0.3);
     transform: translateY(0);
   }
-  33% {
+  50% {
     color: var(--secondary-glow);
-    text-shadow: 0 0 16px rgba(245, 194, 231, 0.6);
-    transform: translateY(-3px); 
+    text-shadow: 0 0 20px rgba(245, 194, 231, 0.5);
+    transform: translateY(-4px); 
   }
-  66% {
+  75% {
     color: var(--tertiary-glow);
-    text-shadow: 0 0 12px rgba(137, 180, 250, 0.4);
-    transform: translateY(-1px);
   }
   100% {
     color: var(--primary-glow);
-    text-shadow: 0 0 12px rgba(203, 166, 247, 0.4);
+    text-shadow: 0 0 15px rgba(203, 166, 247, 0.3);
     transform: translateY(0);
   }
 }
@@ -149,16 +145,16 @@ blyrics-long-word-threshold = 1500;
 }
 
 .blyrics--instrumental-bg {
-  fill: rgba(255, 255, 255, 0.1) !important;
+  fill: rgba(255, 255, 255, 0.05) !important;
 }
 
 @keyframes note-float {
   0%, 100% { transform: translateY(0) rotate(0deg); }
-  50% { transform: translateY(-8px) rotate(5deg); }
+  50% { transform: translateY(-10px) rotate(8deg); }
 }
 
 /* * ===================================================================
- * EXTRAS (Translation & Mobile)
+ * EXTRAS
  * =================================================================== 
  */
 .blyrics-container > div > span.blyrics--translated,
@@ -171,6 +167,7 @@ blyrics-long-word-threshold = 1500;
   animation: none !important;
   text-shadow: none !important;
   transform: none !important;
+  transition: opacity 0.3s ease;
 }
 
 .blyrics-container > div > span.blyrics--romanized {
